@@ -9,11 +9,11 @@ This is my implementation of the full course from Jeremy Chone for the Axum web 
 ## Instructions
 ```sh
 # Terminal 1 - To run the server.
-cargo watch -q -c -w src/ -x "run"
+cargo watch -q -c -w src/ -w .cargo/ -x "run"
 
 # Terminal 2 - To run the quick_dev.
 cargo watch -q -c -w examples/ -x "run --example quick_dev"
 ```
 
 ## Notes
-- Sections Intro through Login Auth-Token Cookies are esstentially the set up of the project and the basic routing and handling of requests. [00::32::30](https://www.youtube.com/watch?v=XZtlD_m59sM&t=1203s) is where the actual implementation of the CRUD api begins.
+- Nice trick with the .cargo/config.toml file to set the default run command to print the debug! statements (note underscore vs. hypen in cargo.toml).
