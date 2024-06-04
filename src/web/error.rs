@@ -5,7 +5,8 @@ use serde::Serialize;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug, Serialize, strum_macros::AsRefStr)]
+#[derive(Debug, Serialize, strum_macros::AsRefStr, Clone)]
+#[serde(tag = "type", content = "data")]
 pub enum Error {
     // -- Login Errors
     LoginFail,

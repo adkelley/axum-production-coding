@@ -1,74 +1,27 @@
-use std::alloc;
+use crate::model;
 
-use axum::{
-    http::StatusCode,
-    response::{IntoResponse, Response},
-};
-use serde::Serialize;
+pub type Result<T> = core::result::Result<T, Error>;
 
-pub type Result<T> = std::result::Result<T, Error>;
-
-// Server Errors
-#[derive(Debug, Clone, Serialize, strum_macros::AsRefStr)]
-#[serde(tag = "type", content = "data")]
+#[derive(Debug)]
 pub enum Error {
-    LoginFail,
-
-    // Auth Errors
-    AuthFailNoAuthTokenCookie,
-    AuthFailTokenWrongFormat,
-    AuthFailCtxNotInRequestExt,
-
-    // Model Errors
-    TicketDeleteFailIdNotFound { id: u64 },
+    // -- Modules
+    Model(model::Error),
 }
 
-// Never pass server errors to the client
-impl IntoResponse for Error {
-    fn into_response(self) -> Response {
-        println!("->> {:<12} - {self:?}", "INTO_RES");
-        // let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
+// region:    --- Froms
+impl From<model::Error> for Error {
+    fn from(val: model::Error) -> Self {
+        Self::Model(val)
+    }
+}
+// endregion: --- Froms
 
-        // Create a placeholder Axum response
-        let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
-
-        // Insert the Error into the response
-        response.extensions_mut().insert(self);
-
-        response
+// region:    --- Error Boilerplate
+impl core::fmt::Display for Error {
+    fn fmt(&self, fmt: &mut core::fmt::Formatter) -> core::result::Result<(), core::fmt::Error> {
+        write!(fmt, "{self:?}")
     }
 }
 
-impl Error {
-    pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
-        // Fallback might be redundant
-        #[allow(unreachable_patterns)]
-        match self {
-            Self::LoginFail => (StatusCode::FORBIDDEN, ClientError::LOGIN_FAIL),
-
-            // -- Auth Errors
-            Self::AuthFailNoAuthTokenCookie
-            | Self::AuthFailTokenWrongFormat
-            | Self::AuthFailCtxNotInRequestExt => (StatusCode::UNAUTHORIZED, ClientError::NO_AUTH),
-
-            // -- Model Errors
-            Self::TicketDeleteFailIdNotFound { id } => {
-                (StatusCode::NOT_FOUND, ClientError::INVALID_PARAMS)
-            }
-            // Fallback
-            _ => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                ClientError::SERVICE_ERROR,
-            ),
-        }
-    }
-}
-// Client Errors
-#[derive(Debug, strum_macros::AsRefStr)]
-#[allow(non_camel_case_types)]
-pub enum ClientError {
-    LOGIN_FAIL,
-    NO_AUTH,
-    INVALID_PARAMS,
-    SERVICE_ERROR,
-}
+impl std::error::Error for Error {}
+// endregion: --- Error Boilerplate

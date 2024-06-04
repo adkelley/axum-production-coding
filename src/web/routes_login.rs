@@ -1,18 +1,15 @@
-use crate::{
-    web::{self, AUTH_TOKEN},
-    Error, Result,
-};
+use crate::web::{self, Error, Result, AUTH_TOKEN};
 use axum::{extract::Json, routing::post, Router};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use tower_cookies::{Cookie, Cookies};
 
 pub fn routes() -> Router {
-    Router::new().route("/api/login", post(api_login))
+    Router::new().route("/api/login", post(api_login_handler))
 }
 
-async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json<Value>> {
-    println!("->> {:<12} - api_login", "HANDLER");
+async fn api_login_handler(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json<Value>> {
+    println!("->> {:<12} - api_login_handler", "HANDLER");
 
     // TODO: Implement login logic
     if payload.username != "demo1" || payload.password != "welcome" {
