@@ -6,3 +6,14 @@
 
 # Scope down tracing, to filter out external lib tracing
 RUST_LOG = "axum_production_course"
+
+# -- Service Environment Variables
+#  IMPORTANT:
+#     These are only used for the `cargo run` command
+#     For deployed env, should be managed bya  container
+#     orchestrator like Kubernetes
+
+## -- ConfigMap
+# This will be relative to Cargo.toml
+# In deployed images, probably should be an absolute path
+SERVICE_WEB_FOLDER = "web-folder/"

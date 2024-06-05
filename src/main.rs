@@ -1,5 +1,6 @@
 // region:    --- Modules
 
+mod config;
 mod ctx;
 mod error;
 mod log;
