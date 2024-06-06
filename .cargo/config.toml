@@ -13,6 +13,11 @@ RUST_LOG = "axum_production_course"
 #     For deployed env, should be managed bya  container
 #     orchestrator like Kubernetes
 
+## -- Secrets
+# Keys and passwords below are for localhost development only.
+# e.g., "welcome" type of passwords
+SERVICE_DB_URL = "postgres://app_user:dev_only_pwd@localhost/app_db"
+
 ## -- ConfigMap
 # This will be relative to Cargo.toml
 # In deployed images, probably should be an absolute path

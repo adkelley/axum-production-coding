@@ -1,4 +1,4 @@
-use crate::web::{self, Error, Result, AUTH_TOKEN};
+use crate::web::{Error, Result, AUTH_TOKEN};
 use axum::{extract::Json, routing::post, Router};
 use serde::Deserialize;
 use serde_json::{json, Value};

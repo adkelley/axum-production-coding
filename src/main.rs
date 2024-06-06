@@ -13,7 +13,7 @@ pub mod _dev_utils;
 pub use self::error::{Error, Result};
 
 use crate::model::ModelManager;
-use crate::web::mw_auth::mw_ctx_resolve;
+use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_res_map::mw_response_map;
 use crate::web::{routes_login, routes_static};
 use axum::{middleware, Router};
@@ -41,8 +41,8 @@ async fn main() -> Result<()> {
     let mm = ModelManager::new().await?;
 
     // -- Define Routes
-    // let routes_rpc = rpc::routes(mm.clone())
-    //   .route_layer(middleware::from_fn(mw_ctx_require));
+    // let routes_rpc =
+    //     rpc::routes::routes(mm.clone()).route_layer(middleware::from_fn(mw_ctx_require));
 
     let routes_all = Router::new()
         .merge(routes_login::routes())
@@ -53,8 +53,14 @@ async fn main() -> Result<()> {
         .fallback_service(routes_static::serve_dir());
 
     // region:    --- Start Server
+    // let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
     let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
     info!("LISTENING on {:?}\n", listener.local_addr());
+    // info!("LISTENING on {:?}\n", addr);
+    // axum::Server::bind(&addr)
+    //     .serve(routes_all.into_make_service())
+    //     .await
+    //     .unwrap();
     axum::serve(listener, routes_all.into_make_service())
         .await
         .unwrap();

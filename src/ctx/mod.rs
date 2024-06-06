@@ -14,7 +14,7 @@ pub struct Ctx {
 // Constructor
 impl Ctx {
     pub fn root_ctx() -> Self {
-        Self { user_id: 0 }
+        Ctx { user_id: 0 }
     }
 
     pub fn new(user_id: i64) -> Result<Self> {

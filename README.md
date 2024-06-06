@@ -11,7 +11,7 @@ This is my implementation of the full course from Jeremy Chone for the Axum web 
 # Start the postgresql server docker image:
 docker run --rm --name pg -p 5432:5432 \
     -e POSTGRES_PASSWORD=welcome \
-    postgres:15
+    postgres:latest
 ```
 
 ```sh
@@ -19,6 +19,17 @@ docker run --rm --name pg -p 5432:5432 \
 # In another terminal (tab) run psql
 docker exec -it -u postgres pg psql
 ```
+
+## Unit Test (watch)
+
+```sh
+cargo watch -q -c -x "test -- --nocapture"
+
+# specific test with filter
+cargo watch -q -c -x "test model::task::tests::test_create -- --nocapture --test test_get_user"
+```
+
+## Development
 
 ```sh
 # Terminal 1 - To run the server.
