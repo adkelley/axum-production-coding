@@ -12,9 +12,10 @@
 //! - In frameworks like Axum, Tauri, `ModelManager` is typically used as App State
 //!   to all Model Controllers functions.
 // region:         ---Modules
+mod base; // private to the model layer
 mod error;
 mod store;
-pub mod task;
+pub mod task; // only task is public for now
 
 pub use self::error::{Error, Result};
 

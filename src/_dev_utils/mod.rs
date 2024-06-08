@@ -62,8 +62,3 @@ pub async fn seed_tasks(ctx: &Ctx, mm: &ModelManager, titles: &[&str]) -> model:
 
     Ok(tasks)
 }
-
-pub async fn test_task_titles() -> () {
-    vec!["test_list_ok-task 01", "test_list_ok-task 02"];
-    println!("I am in test_task_titles")
-}
