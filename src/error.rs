@@ -9,6 +9,7 @@ pub enum Error {
 
     // -- Config
     ConfigMissingEnv(&'static str),
+    ConfigWrongFormat(&'static str),
 }
 
 // region:    --- Froms

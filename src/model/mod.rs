@@ -16,6 +16,7 @@ mod base; // private to the model layer
 mod error;
 mod store;
 pub mod task; // only task is public for now
+pub mod user;
 
 pub use self::error::{Error, Result};
 

@@ -30,19 +30,18 @@ pub async fn mw_ctx_resolve(
     mut req: Request<Body>,
     next: Next,
 ) -> Result<Response> {
-    debug!("{:<12} - mw_ctx_resolver", "MIDDLEWARE");
+    debug!("{:<12} - mw_ctx_resolve", "MIDDLEWARE");
 
     let auth_token = cookies
         .get(AUTH_TOKEN)
-        .map(|c: Cookie| c.value().to_string())
-        .unwrap();
+        .map(|c: Cookie| c.value().to_string());
 
     // Compute Result<Ctx> from auth_token.
     let result_ctx = Ctx::new(100).map_err(|ex| CtxExtError::CtxCreateFail(ex.to_string()));
 
     // Remove the cookie if something went wrong other than NoAuthTokenCookie.
     if result_ctx.is_err() && !matches!(result_ctx, Err(CtxExtError::TokenNotInCookie)) {
-        cookies.remove(Cookie::from(auth_token))
+        cookies.remove(Cookie::named(AUTH_TOKEN))
     }
 
     // Store the ctx_result in the request extensions.

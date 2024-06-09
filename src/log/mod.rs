@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::time::SystemTime;
 
 use axum::http::{Method, Uri};
@@ -16,7 +17,7 @@ pub async fn log_request(
     req_method: Method,
     uri: Uri,
     ctx: Option<Ctx>,
-    web_error: Option<&web::Error>,
+    web_error: Option<&Arc<web::Error>>,
     client_error: Option<ClientError>,
 ) -> Result<()> {
     let timestamp = SystemTime::now()
@@ -44,7 +45,7 @@ pub async fn log_request(
         error_data,
     };
 
-    debug!("log_request: \n{}", json!(log_line));
+    debug!("REQUEST LOG LINE: \n{}", json!(log_line));
 
     // TODO -- Send to CloudWatch service
 

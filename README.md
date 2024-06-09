@@ -41,3 +41,5 @@ cargo watch -q -c -w examples/ -x "run --example quick_dev"
 
 ## Notes
 - Nice trick with the .cargo/config.toml file to set the default run command to print the debug! statements (note underscore vs. hypen in cargo.toml).
+- Another encyrption library to consider: [argon2](https://crates.io/crates/argon2)
+- Specifying the duration unit in a variable name is a good practice. Example: `SESSION_DURATION_MINUTES=30` vs. `SESSION_DURATION=30`

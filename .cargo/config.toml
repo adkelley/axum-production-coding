@@ -18,6 +18,11 @@ RUST_LOG = "axum_production_course"
 # e.g., "welcome" type of passwords
 SERVICE_DB_URL = "postgres://app_user:dev_only_pwd@localhost/app_db"
 
+SERVICE_PWD_KEY = "IzaOsGjEa9Z0dIjUlnjxmn8X0wkVqk2dROpm8IfGijjkXKW0NrrUJk-x6HaULJY9YAyMo56AH2hiAoiUEkUTLw"
+
+SERVICE_TOKEN_KEY = "ioO8mY1osyxv4BEHFwr9G9UEq1A1MA_GyrBCArKIes_MSKA0WEH48omiH4gXpH8Og37Yp4fR505EBar6A8dpkQ"
+SERVICE_TOKEN_DURATION_SEC = "1800"                                                                          # 30 minutes
+
 ## -- ConfigMap
 # This will be relative to Cargo.toml
 # In deployed images, probably should be an absolute path

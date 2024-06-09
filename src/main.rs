@@ -1,6 +1,7 @@
 // region:    --- Modules
 
 mod config;
+mod crypt;
 mod ctx;
 mod error;
 mod log;
@@ -45,7 +46,7 @@ async fn main() -> Result<()> {
     //     rpc::routes::routes(mm.clone()).route_layer(middleware::from_fn(mw_ctx_require));
 
     let routes_all = Router::new()
-        .merge(routes_login::routes())
+        .merge(routes_login::routes(mm.clone()))
         // .nest("/api", routes_rpc)
         .layer(middleware::map_response(mw_response_map))
         .layer(middleware::from_fn_with_state(mm.clone(), mw_ctx_resolve))
@@ -53,14 +54,8 @@ async fn main() -> Result<()> {
         .fallback_service(routes_static::serve_dir());
 
     // region:    --- Start Server
-    // let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
     let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
     info!("LISTENING on {:?}\n", listener.local_addr());
-    // info!("LISTENING on {:?}\n", addr);
-    // axum::Server::bind(&addr)
-    //     .serve(routes_all.into_make_service())
-    //     .await
-    //     .unwrap();
     axum::serve(listener, routes_all.into_make_service())
         .await
         .unwrap();

@@ -1,4 +1,6 @@
-use crate::web;
+use std::sync::Arc;
+
+use crate::{crypt, model, web};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
@@ -6,15 +8,31 @@ use tracing::debug;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug, Serialize, strum_macros::AsRefStr, Clone)]
+#[derive(Debug, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "type", content = "data")]
+#[allow(non_camel_case_types)]
 pub enum Error {
     // -- Login Errors
-    LoginFail,
+    LoginFailUsernameNotFound,
+    LoginFailUserHasNoPwd { user_id: i64 },
+    LoginFailPwdNotMatching { user_id: i64 },
 
     // -- CtxExtError
     CtxExt(web::mw_auth::CtxExtError),
+
+    // -- Modules
+    Model(model::Error),
+
+    SERVICE_ERROR,
 }
+
+// region:         — Froms
+impl From<model::Error> for Error {
+    fn from(val: model::Error) -> Self {
+        Error::Model(val)
+    }
+}
+// endregion:      — Froms
 
 // region:         --- Axum IntoResponse
 impl IntoResponse for Error {
@@ -25,7 +43,7 @@ impl IntoResponse for Error {
         let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
 
         // Insert the Error into the response
-        response.extensions_mut().insert(self);
+        response.extensions_mut().insert(Arc::new(self));
 
         response
     }
@@ -48,7 +66,12 @@ impl Error {
         // Fallback might be redundant
         #[allow(unreachable_patterns)]
         match self {
-            // -- Login/Auth
+            // -- Login
+            LoginFailUsernameNotFound
+            | LoginFailUserHasNoPwd { .. }
+            | LoginFailPwdNotMatching { .. } => (StatusCode::FORBIDDEN, ClientError::LOGIN_FAIL),
+
+            // -- Auth
             CtxExt(_) => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
             // Fallback
