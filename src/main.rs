@@ -6,6 +6,7 @@ mod ctx;
 mod error;
 mod log;
 mod model;
+mod utils;
 mod web;
 
 // #[cfg(test)] // Commented during early development
@@ -17,6 +18,8 @@ use crate::model::ModelManager;
 use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_res_map::mw_response_map;
 use crate::web::{routes_login, routes_static};
+use axum::response::Html;
+use axum::routing::get;
 use axum::{middleware, Router};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
@@ -45,8 +48,13 @@ async fn main() -> Result<()> {
     // let routes_rpc =
     //     rpc::routes::routes(mm.clone()).route_layer(middleware::from_fn(mw_ctx_require));
 
+    let routes_hello = Router::new()
+        .route("/hello", get(|| async { Html("Hello World") }))
+        .route_layer(middleware::from_fn(mw_ctx_require));
+
     let routes_all = Router::new()
         .merge(routes_login::routes(mm.clone()))
+        .merge(routes_hello)
         // .nest("/api", routes_rpc)
         .layer(middleware::map_response(mw_response_map))
         .layer(middleware::from_fn_with_state(mm.clone(), mw_ctx_resolve))

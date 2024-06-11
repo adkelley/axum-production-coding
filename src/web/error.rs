@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::{crypt, model, web};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
+use hmac::digest::impl_oid_carrier;
 use serde::Serialize;
 use tracing::debug;
 
@@ -22,6 +23,7 @@ pub enum Error {
 
     // -- Modules
     Model(model::Error),
+    Crypt(crypt::Error),
 
     SERVICE_ERROR,
 }
@@ -30,6 +32,12 @@ pub enum Error {
 impl From<model::Error> for Error {
     fn from(val: model::Error) -> Self {
         Error::Model(val)
+    }
+}
+
+impl From<crypt::Error> for Error {
+    fn from(val: crypt::Error) -> Self {
+        Self::Crypt(val)
     }
 }
 // endregion:      — Froms

@@ -20,7 +20,7 @@ serde_with = "3.8.1"
 axum = { version = "0.7.5", features = ["macros"] }
 tower-cookies = "0.10.0"
 tower-http = { version = "0.5.2", features = ["fs"] }
-# Tracing
+# -- Tracing
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 # -- Database
@@ -41,6 +41,7 @@ async-trait = "0.1.80"                                      # makes async fn in 
 strum_macros = "0.26.3"
 uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
 sqlb = "0.4.0"
+time = "0.3.36"
 
 [dev-dependencies]
 anyhow = "1.0.86"

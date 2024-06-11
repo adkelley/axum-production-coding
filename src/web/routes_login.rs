@@ -5,7 +5,7 @@ use crate::{
         user::{UserBmc, UserForLogin},
         ModelManager,
     },
-    web::{Error, Result, AUTH_TOKEN},
+    web::{self, remove_token_cookie, Error, Result, AUTH_TOKEN},
 };
 use axum::{
     extract::{Json, State},
@@ -18,9 +18,13 @@ use tower_cookies::{Cookie, Cookies};
 use tracing::debug;
 
 pub fn routes(mm: ModelManager) -> Router {
-    Router::new().route("/api/login", post(api_login_handler).with_state(mm))
+    Router::new()
+        .route("/api/login", post(api_login_handler))
+        .route("/api/logoff", post(api_logoff_handler))
+        .with_state(mm)
 }
 
+// region:    --- Login
 async fn api_login_handler(
     State(mm): State<ModelManager>,
     cookies: Cookies,
@@ -55,8 +59,8 @@ async fn api_login_handler(
     )
     .map_err(|_| Error::LoginFailPwdNotMatching { user_id })?;
 
-    // FIXME: Implement real auth-token generation/signature.
-    cookies.add(Cookie::new(AUTH_TOKEN, "user-1.exp.sign"));
+    // -- Set the web token
+    web::set_token_cookie(&cookies, &user.username, &user.token_salt.to_string())?;
 
     // Create the success body.
     let body = Json(json!({
@@ -73,3 +77,32 @@ struct LoginPayload {
     username: String,
     password: String,
 }
+// endregion: --- Login
+
+// region:    --- Logoff
+async fn api_logoff_handler(
+    cookies: Cookies,
+    Json(payload): Json<LogoffPayload>,
+) -> Result<Json<Value>> {
+    debug!("{:<12} - api_logoff_handler", "HANDLER");
+    let should_logoff = payload.logoff;
+
+    if should_logoff {
+        remove_token_cookie(&cookies)?;
+    }
+
+    // Create the success body.
+    let body = Json(json!({
+        "result": {
+            "logged_off": should_logoff
+        }
+    }));
+
+    Ok(body)
+}
+
+#[derive(Debug, Deserialize)]
+struct LogoffPayload {
+    logoff: bool,
+}
+// endregion: --- Logoff
