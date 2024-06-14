@@ -77,7 +77,7 @@ async fn pexec(db: &Db, file: &str) -> Result<(), sqlx::Error> {
     let content = fs::read_to_string(file)?;
 
     // FIXME: Make the split more sql proof.
-    let sqls: Vec<&str> = content.split(";").collect();
+    let sqls: Vec<&str> = content.split(';').collect();
 
     for sql in sqls {
         // -- Execute the sql

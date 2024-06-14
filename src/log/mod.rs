@@ -9,13 +9,15 @@ use tracing::debug;
 use uuid::Uuid;
 
 use crate::ctx::Ctx;
+use crate::web::rpc::RpcInfo;
 use crate::web::{self, ClientError};
 use crate::Result;
 
 pub async fn log_request(
-    uuid: Uuid,
-    req_method: Method,
+    uuid: Uuid,         // uuid string formatted
+    req_method: Method, // (should be iso8601)
     uri: Uri,
+    rpc_info: Option<&RpcInfo>,
     ctx: Option<Ctx>,
     web_error: Option<&Arc<web::Error>>,
     client_error: Option<ClientError>,
@@ -32,15 +34,22 @@ pub async fn log_request(
 
     // Create the RequestLogLine
     let log_line = RequestLogLine {
-        uuid: uuid.to_string(),
-        timestamp: timestamp.to_string(),
+        uuid: uuid.to_string(),           // uuid string formatted
+        timestamp: timestamp.to_string(), // (should be iso8601)
 
+        // -- User and context attributes
+        user_id: ctx.map(|c| c.user_id()),
+
+        // -- http request attributes.
         http_path: uri.to_string(),
         http_method: req_method.to_string(),
 
-        user_id: ctx.map(|c| c.user_id()),
+        // -- RPC information
+        rpc_id: rpc_info.and_then(|rpc| rpc.id.as_ref().map(|id| id.to_string())),
+        rpc_method: rpc_info.map(|rpc| rpc.method.to_string()),
 
         client_error_type: client_error.map(|ce| ce.as_ref().to_string()),
+
         error_type,
         error_data,
     };
@@ -65,6 +74,10 @@ struct RequestLogLine {
     // -- Http request attributes
     http_path: String,
     http_method: String,
+
+    // -- rpc info
+    rpc_id: Option<String>,
+    rpc_method: Option<String>,
 
     // -- Error attributes
     client_error_type: Option<String>,
