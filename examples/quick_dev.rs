@@ -29,7 +29,7 @@ async fn main() -> Result<()> {
             }
         }),
     );
-    // req_create_task.await?.print().await?;
+    req_create_task.await?.print().await?;
 
     let req_list_tasks = hc.do_post(
         "/api/rpc",
@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
             }
         }),
     );
-    // req_update_task.await?.print().await?;
+    req_update_task.await?.print().await?;
 
     let req_delete_task = hc.do_post(
         "/api/rpc",

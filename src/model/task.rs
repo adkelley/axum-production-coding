@@ -2,8 +2,8 @@ use crate::ctx::Ctx;
 use crate::model::base;
 use crate::model::ModelManager;
 use crate::model::{Error, Result};
+use modql::field::Fields;
 use serde::{Deserialize, Serialize};
-use sqlb::Fields;
 use sqlx::FromRow;
 
 // region:         — Task Types
