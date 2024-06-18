@@ -1,5 +1,6 @@
 // region:    --- Modules
 
+mod params;
 mod task_rpc;
 
 use crate::{
@@ -30,21 +31,6 @@ struct RpcRequest {
     params: Option<Value>,
 }
 
-#[derive(Deserialize)]
-pub struct ParamsForCreate<D> {
-    data: D,
-}
-
-#[derive(Deserialize)]
-pub struct ParamsForUpdate<D> {
-    id: i64,
-    data: D,
-}
-
-#[derive(Deserialize)]
-pub struct ParamsIded {
-    id: i64,
-}
 // endregion: --- RPC Types
 
 // region:    --- Routing
@@ -110,7 +96,7 @@ async fn _rpc_handler(ctx: Ctx, mm: ModelManager, rpc_req: RpcRequest) -> Result
     let result_json: Value = match rpc_method.as_str() {
         // -- Task RPC methods.
         "create_task" => exec_rpc_fn!(create_task, ctx, mm, rpc_params),
-        "list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
+        "list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm, rpc_params),
         "update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
         "delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
 
