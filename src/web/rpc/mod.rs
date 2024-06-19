@@ -16,6 +16,7 @@ use axum::{
 };
 use serde::Deserialize;
 use serde_json::{from_value, json, to_value, Value};
+use std::sync::Arc;
 use task_rpc::{create_task, delete_task, list_tasks, update_task};
 use tracing::debug;
 
@@ -53,13 +54,13 @@ async fn rpc_handler(
 
     // -- Exec & Store RpcInfo in reponse.
     let mut response = _rpc_handler(ctx, mm, rpc_req).await.into_response();
-    response.extensions_mut().insert(rpc_info);
+    response.extensions_mut().insert(Arc::new(rpc_info));
 
     response
 }
 
 /// RPC basic information holding the id and method for further logging
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct RpcInfo {
     pub id: Option<Value>,
     pub method: String,

@@ -38,7 +38,7 @@ pub async fn mw_ctx_resolve(
 
     // If auth token is invalid then remove it, so we don't keep validating
     if ctx_ext_result.is_err() && !matches!(ctx_ext_result, Err(CtxExtError::TokenNotInCookie)) {
-        cookies.remove(Cookie::named(AUTH_TOKEN))
+        cookies.remove(Cookie::from(AUTH_TOKEN))
     }
 
     // Store the ctx_ext_result in the request extension

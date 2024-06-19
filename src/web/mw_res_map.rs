@@ -22,7 +22,7 @@ pub async fn mw_response_map(
     debug!("{:<12} - mw_response_map", "RES_MAPPER");
     let uuid = Uuid::new_v4();
 
-    let rpc_info = res.extensions().get::<RpcInfo>();
+    let rpc_info = res.extensions().get::<Arc<RpcInfo>>().map(Arc::as_ref);
 
     // -- Get the eventual response error
     let web_error = res.extensions().get::<Arc<web::Error>>();
