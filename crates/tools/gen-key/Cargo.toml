@@ -1,0 +1,11 @@
+[package]
+name = "gen-key"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# -- App Crates
+lib-utils = { path = "../../libs/lib-utils"}
+# -- Others
+anyhow = "1.0.86" # Ok for tools/
+rand = "0.8.5"
