@@ -1,0 +1,52 @@
+[package]
+name = "axum-production-course"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.78.0"
+description = "Jeremy Chone's course on building production-ready web services with Axum"
+license = "MIT or Apache-2.0"
+
+[lints.rust]
+unsafe-code = "forbid"
+unused = "allow"       # for exploratory dev.
+
+[dependencies]
+tokio = { version = "1.38.0", features = ["full"] }
+# -- Serde / json
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.117"
+serde_with = "3.8.1"
+# -- Axum
+axum = { version = "0.7.5", features = ["macros"] }
+tower-cookies = "0.10.0"
+tower-http = { version = "0.5.2", features = ["fs"] }
+# -- Database
+sqlx = { version = "0.7.4", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "uuid",
+    "time",
+] }
+sea-query = "0.30.7"
+sea-query-binder = { version = "0.5", features = ["sqlx-postgres", "with-uuid"]}
+modql = { version = "0.3.10", features = ["with-sea-query"] }
+# -- Crypt & Encoding
+rand = "0.8.5"
+hmac = "0.12.1"
+sha2 = "0.10.8"
+base64-url = "3.0.0"
+# -- Tracing
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+# -- Others
+lazy-regex = "3.1.0"
+async-trait = "0.1.80"                                      # makes async fn in traits work
+strum_macros = "0.26.3"
+uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
+time = "0.3.36"
+derive_more = { version = "0.99.18", features = ["from"] }
+
+[dev-dependencies]
+anyhow = "1.0.86"
+httpc-test = "0.1.9"
+serial_test = "3.1.1"
