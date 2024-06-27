@@ -23,6 +23,7 @@ argon2 = { version = "0.5.3", features = ["std"] }
 uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
 lazy-regex = "3.1.0"
 derive_more = "0.99.18"
+enum_dispatch = "0.3.13"
 
 [dev-dependencies]
 anyhow = "1.0.86"

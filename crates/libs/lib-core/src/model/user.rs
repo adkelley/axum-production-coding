@@ -25,10 +25,10 @@ pub struct UserForCreate {
     pub pwd_clear: String,
 }
 
-#[derive(Fields)]
-struct UserForInsert {
-    username: String,
-}
+// #[derive(Fields)]
+// struct UserForInsert {
+//     username: String,
+// }
 
 // login logic
 #[derive(Clone, FromRow, Fields, Debug)]
