@@ -16,6 +16,7 @@ use uuid::Uuid;
 
 // region:    --- Types
 
+#[derive(Debug, Clone)]
 pub struct ContentToHash {
     pub content: String, // Clear content.
     pub salt: Uuid,
@@ -25,39 +26,45 @@ pub struct ContentToHash {
 // region:    --- Public Functions
 
 /// Hash the password with the default scheme.
-pub fn hash_pwd(to_hash: &ContentToHash) -> Result<String> {
-    hash_for_scheme(DEFAULT_SCHEME, to_hash)
+pub async fn hash_pwd(to_hash: ContentToHash) -> Result<String> {
+    tokio::task::spawn_blocking(move || hash_for_scheme(DEFAULT_SCHEME, to_hash))
+        .await
+        .map_err(|_| Error::FailSpawnBlocking)?
 }
 
 /// Validate if ContentToHash matches.
-pub fn validate_pwd(to_hash: &ContentToHash, pwd_ref: &str) -> Result<SchemeStatus> {
+pub async fn validate_pwd(to_hash: ContentToHash, pwd_ref: &str) -> Result<SchemeStatus> {
     let PwdParts {
         scheme_name,
         hashed,
     } = pwd_ref.parse()?;
 
-    validate_for_scheme(&scheme_name, to_hash, &hashed)?;
-
-    if scheme_name == DEFAULT_SCHEME {
-        Ok(SchemeStatus::Ok)
+    let scheme_status = if scheme_name == DEFAULT_SCHEME {
+        SchemeStatus::Ok
     } else {
-        Ok(SchemeStatus::Outdated)
-    }
+        SchemeStatus::Outdated
+    };
+
+    tokio::task::spawn_blocking(move || validate_for_scheme(&scheme_name, to_hash, &hashed))
+        .await
+        .map_err(|_| Error::FailSpawnBlockForValidate)??;
+
+    Ok(scheme_status)
 }
 // endregion: --- Public Functions
 
 // region:    --- Privates
 
-fn hash_for_scheme(scheme_name: &str, to_hash: &ContentToHash) -> Result<String> {
+fn hash_for_scheme(scheme_name: &str, to_hash: ContentToHash) -> Result<String> {
     let scheme = get_scheme(scheme_name)?;
 
-    let pwd_hashed = scheme.hash(to_hash)?;
+    let pwd_hashed = scheme.hash(&to_hash)?;
 
     Ok(format!("#{scheme_name}#{pwd_hashed}"))
 }
 
-fn validate_for_scheme(scheme_name: &str, to_hash: &ContentToHash, pwd_ref: &str) -> Result<()> {
-    get_scheme(scheme_name)?.validate(to_hash, pwd_ref)?;
+fn validate_for_scheme(scheme_name: &str, to_hash: ContentToHash, pwd_ref: &str) -> Result<()> {
+    get_scheme(scheme_name)?.validate(&to_hash, pwd_ref)?;
     Ok(())
 }
 
@@ -90,8 +97,8 @@ mod tests {
     use super::*;
     use anyhow::Result;
 
-    #[test]
-    fn test_multi_scheme_ok() -> Result<()> {
+    #[tokio::test]
+    async fn test_multi_scheme_ok() -> Result<()> {
         // -- Setup & Fixtures
         let fx_salt = Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453")?;
         let fx_to_hash = ContentToHash {
@@ -100,8 +107,8 @@ mod tests {
         };
 
         // -- Exec
-        let pwd_hashed = hash_for_scheme("01", &fx_to_hash)?;
-        let pwd_validate = validate_pwd(&fx_to_hash, &pwd_hashed)?;
+        let pwd_hashed = hash_for_scheme("01", fx_to_hash.clone())?;
+        let pwd_validate = validate_pwd(fx_to_hash, &pwd_hashed).await?;
 
         // -- Check
         assert!(

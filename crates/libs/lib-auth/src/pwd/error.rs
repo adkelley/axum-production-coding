@@ -9,6 +9,9 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
     PwdWithSchemeFailedParse,
 
+    FailSpawnBlocking,
+    FailSpawnBlockForValidate,
+
     // -- Modules
     #[from]
     Scheme(scheme::Error),
